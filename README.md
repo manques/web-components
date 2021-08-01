@@ -51,3 +51,53 @@
 
 ## ------------------------------------ Flatten DOM -------------------------------------
 ### The process of rendering slotted elements inside their slots is called “composition”. The result is called a “flattened DOM”.
+
+## ----------------- style ----------------------------------
+### shadow DOM can include styles, such as <style> or <link rel="stylesheet">.
+## Cascading
+### The shadow host (<custom-dialog> itself) resides in the light DOM, so it’s affected by document CSS rules.
+### If there’s a property styled both in :host locally, and in the document, then the document style takes precedence.
+
+## Styling slotted content
+### Slotted elements come from light DOM, so they use document styles. Local styles do not affect slotted content.
+## style slotted elements in our component, there are two choices
+### 1.<slot> itself and rely on CSS inheritance:
+### 2. use ::slotted(selector) pseudo-class. It matches elements based on two conditions:
+#### a) That’s a slotted element, that comes from the light DOM. Slot name doesn’t matter. Just any slotted element, but only the element itself, not its children.
+####  b) The element matches the selector.
+#### Please note, ::slotted selector can’t descend any further into the slot. These selectors are invalid:
+#### Also, ::slotted can only be used in CSS. We can’t use it in querySelector.
+
+##  CSS hooks with custom properties
+### There’s no selector that can directly affect shadow DOM styles from the document. But just as we expose methods to interact with our component, we can expose CSS variables (custom CSS properties) to style it.
+## Custom CSS properties exist on all levels, both in light and shadow.
+### in shadow DOM we can use --user-card-field-color CSS variable to style fields, and the outer document can set its value:
+
+## Document styles can affect:
+### shadow host (as it lives in the outer document)
+### slotted elements and their contents (as that’s also in the outer document)
+### When CSS properties conflict, normally document styles have precedence, unless the property is labelled as !important. Then local styles have precedence.
+
+## CSS custom properties pierce through shadow DOM. They are used as “hooks” to style the component:
+### 1.The component uses a custom CSS property to style key elements, such as var(--component-name-title, <default value>).
+### 2. Component author publishes these properties for developers, they are same important as other public component methods.
+### 3.When a developer wants to style a title, they assign --component-name-title CSS property for the shadow host or above.
+
+## --------------------------  Shadow DOM and events ---------------------------------------------------------
+### Events that happen in shadow DOM have the host element as the target, when caught outside of the component.
+### If you click on the button, the messages are:
+#### Inner target: BUTTON – internal event handler gets the correct target, the element inside shadow DOM.
+#### Outer target: USER-CARD – document event handler gets shadow host as the target.
+## Retargeting does not occur if the event occurs on a slotted element, that physically lives in the light DOM.
+
+## Bubbling, event.composedPath()
+`<user-card id="userCard">
+  #shadow-root
+    <div>
+      <b>Name:</b>
+      <slot name="username">
+        <span slot="username">John Smith</span>
+      </slot>
+    </div>
+</user-card>`
+### So, for a click on <span slot="username">, a call to event.composedPath() returns an array: [span, slot, div, shadow-root, user-card, body, html, document, window]. That’s exactly the parent chain from the target element in the flattened DOM, after the composition.
