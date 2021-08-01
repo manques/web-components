@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<template id="templ">
+    <style>
+        :host{
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            display: inline-block;
+            transform: translate(-50%, -50%);
+            background: lightgray;
+            border: 1px solid red;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+    </style>
+    <slot></slot>
+</template>
+
+<script>
+    customElements.define('custom-dialog', class extends HTMLElement{
+        connectedCallback(){
+            this.attachShadow({mode: 'open'})
+            .append(templ.content.cloneNode(true));
+        }
+    });
+</script>
+
+<custom-dialog>Hello!</custom-dialog>

@@ -41,10 +41,13 @@
 ### outer initialized.
 ### inner initialized.
 
-# ----------------  2. Customized built-in elements -------------------------------------
+# ------------------------------  2. Customized built-in elements --------------------------
 ## Extend HTMLButtonElement with our class:
 ### class HelloButton extends HTMLButtonElement { /* custom element methods */ }
 ## Provide the third argument to customElements.define, that specifies the tag:
 ### customElements.define('hello-button', HelloButton, {extends: 'button'});
 ## At the end, to use our custom element, insert a regular <button> tag, but add is="hello-button" to it:
 ### <button is="hello-button">...</button>
+
+## ------------------------------------ Flatten DOM -------------------------------------
+### The process of rendering slotted elements inside their slots is called “composition”. The result is called a “flattened DOM”.
